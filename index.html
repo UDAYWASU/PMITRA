@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parents Mitra!</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .chat-box {
+            height: 400px;
+            border: 1px solid #ddd;
+            overflow-y: scroll;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .chat-box .message {
+            margin: 10px 0;
+        }
+        .chat-box .message.user {
+            text-align: right;
+            color: #fff;
+            background-color: #007bff;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 70%;
+            margin-left: auto;
+        }
+        .chat-box .message.bot {
+            text-align: left;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: 70%;
+            margin-right: auto;
+        }
+        .message-input {
+            width: calc(100% - 60px);
+            padding: 10px;
+        }
+        .send-button {
+            width: 50px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .middle-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #fd6254;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="middle-area" style="background-color: #003366; padding: 5px; display: flex; align-items: center;">
+            <div>
+                <a href="/">
+                    <img src="{{ url_for('static', filename='images/prp_logo.jpeg') }}" alt="" style="width: 120px;">
+                </a>
+            </div>
+            <div style="border-left: 2px solid #fd6254; height: 75px; margin-left: 10px;"></div>
+            <div class="service-list" style="color: #fd6254; font-family: Rockwell; margin-left: 10px;">
+                <div style="text-align: left;">
+                    <div style="font-size: .9rem; font-weight: 600; letter-spacing: 1px;">P. R. Pote Patil</div>
+                    <div style="color: rgba(245, 245, 245, 0.808); font-size: .9rem; font-weight: 500;">College of Engineering & Management, Amravati<br>(An Autonomous Institute)</div>
+                </div>
+            </div>
+            <div style="margin-left: auto;">
+                <img src="{{ url_for('static', filename='images/naac_logo.png') }}" alt="" style="width: 160px;">
+            </div>
+            <div>
+                <button type="button" class="navbar-toggler" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    
+
+<div class="chat-container">
+    <div class="header">
+        <h1>Parents Mitra!</h1>
+    </div>
+    <div class="chat-box" id="chat-box"></div>
+    
+    <div>
+        <input type="text" id="user-input" class="message-input" placeholder="Type your message here..." onkeydown="handleEnter(event)">
+        <button class="send-button" onclick="sendMessage()">Ask</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+
+    // Function to add a welcome message
+    function addWelcomeMessage() {
+        const welcomeMessage = "Welcome to Parents Mitra! How can I assist you today?";
+        addMessageToChat(welcomeMessage, 'bot');
+    }
+
+    function handleEnter(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (message === "") return;
+
+        addMessageToChat(message, 'user');
+        userInput.value = '';
+
+        fetch('/get_response', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            addMessageToChat(data.response, 'bot');
+        });
+    }
+
+    function addMessageToChat(message, sender) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', sender);
+        messageElement.textContent = message;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
+    }
+
+    // Add the welcome message when the page loads
+    window.onload = function() {
+        addWelcomeMessage();
+    };
+</script>
+
+</body>
+</html>
